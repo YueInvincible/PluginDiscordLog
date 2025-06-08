@@ -3,4 +3,4 @@ version: 1.0.0
 main: com.yue.discordlogger.Main
 api-version: "1.20"
 author: yue
-description: Plugin don gian
+description: Discord Logger Plugin.
