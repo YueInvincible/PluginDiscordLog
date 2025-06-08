@@ -1,0 +1,8 @@
+# Command & Chat
+chat-command-webhook: "https://discord.com/api/webhooks/…"
+
+# Start/Stop
+startup-shutdown-webhook: "https://discord.com/api/webhooks/…"
+
+# Số log để gom lại
+batch-size: 20
