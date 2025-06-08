@@ -29,9 +29,9 @@ public class Main extends JavaPlugin implements Listener {
     private String hookLife;
     private int batchSize;
     private final List<String> logBuffer = new ArrayList<>();
-    private final SimpleDateFormat fm = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-    private static final String USERNAME = "Yue";
-    private static final String AVATAR_URL = "https://media.discordapp.net/attachments/908685577266806784/1376882037021212764/FUyLRsVWAAA0G8-.jpg";
+    private final SimpleDateFormat fm = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy"); //Time Format
+    private static final String USERNAME = "Yue"; //Webhook Name
+    private static final String AVATAR_URL = "https://media.discordapp.net/attachments/908685577266806784/1376882037021212764/FUyLRsVWAAA0G8-.jpg"; //Webhook Avatar
     private volatile boolean shutdownHandled = false;
     private final Queue<String> messageQueue = new ConcurrentLinkedQueue<>();
     private final DateTimeFormatter fmt = DateTimeFormatter
@@ -46,23 +46,23 @@ public class Main extends JavaPlugin implements Listener {
         batchSize = getConfig().getInt("batch-size", 20);
 
         Bukkit.getPluginManager().registerEvents(this, this);
-        sendWebhookAsync(hookLife, "**Server đã mở**\n> Thời gian: `" + now() + "`\n> IP: `" + getServerIp() + "`");
+        sendWebhookAsync(hookLife, "**Server is online!**\n> Time: `" + now() + "`\n> IP: `" + getServerIp() + "`");
 
-        // Gửi log định kỳ mỗi 1 phút
+        // Log would be send after a minute
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, this::flush, 20 * 60, 20 * 60);
 
-        // Đảm bảo gửi log còn lại và thông báo tắt khi server bị shutdown
+        // Making sure log would be send after shutting down server and notify server shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             synchronized (logBuffer) {
                 if (!shutdownHandled) {
                     shutdownHandled = true;
-                    // Flush những log còn lại
+                    // Flush Log
                     flushBatchSync();
-                    // Gửi thông báo server đóng
+                    // Server Closed
                     String t = fmt.format(Instant.now());
                     sendWebhookSync(hookLife,
-                        "**Server đã tắt (shutdown-hook)**\n"
-                      + "> Thời gian: `" + t + "`"
+                        "**Server is offline (shutdown-hook)**\n"
+                      + "> Time: `" + t + "`"
                     );
                 }
 
@@ -72,7 +72,7 @@ public class Main extends JavaPlugin implements Listener {
                     logBuffer.clear();
                 }
             }
-            sendWebhookSync(hookLife, "**Server đã tắt**\n> Thời gian: `" + now() + "`");
+            sendWebhookSync(hookLife, "**Server is offline**\n> Time: `" + now() + "`");
         }));
     }
 
@@ -85,11 +85,11 @@ public class Main extends JavaPlugin implements Listener {
             // Gửi thông báo server đóng
             String time = fmt.format(Instant.now());
             sendWebhookAsync(hookLife,
-                "**Server đã tắt**\n"
-              + "> Thời gian: `" + time + "`"
+                "**Server is offline**\n"
+              + "> Time: `" + time + "`"
             );
         }
-        getLogger().info("DiscordLoggerPlugin đã tắt.");
+        getLogger().info("DiscordLoggerPlugin is off.");
     }
 
     @EventHandler
@@ -99,20 +99,20 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
-        addLog("🧭 **" + e.getPlayer().getName() + "** dùng lệnh: `" + e.getMessage() + "`");
+        addLog("🧭 **" + e.getPlayer().getName() + "** executed: `" + e.getMessage() + "`");
     }
 
     @EventHandler
     public void onConsoleCommand(ServerCommandEvent e) {
         CommandSender sender = e.getSender();
         if (sender instanceof ConsoleCommandSender) {
-            addLog("🖥️ **Console** dùng lệnh: `" + e.getCommand() + "`");
+            addLog("🖥️ **Console** executed: `" + e.getCommand() + "`");
         } else {
-            addLog("🧭 **" + sender.getName() + "** dùng lệnh: `" + e.getCommand() + "`");
+            addLog("🧭 **" + sender.getName() + "** executed: `" + e.getCommand() + "`");
         }
     }
 
-    /** Flush đồng bộ (trong shutdown hook hoặc onDisable) **/
+    /** Flush sync (shutdown hook and onDisable) **/
     private void flushBatchSync() {
         if (messageQueue.isEmpty()) return;
 
@@ -168,12 +168,12 @@ public class Main extends JavaPlugin implements Listener {
 
             int code = conn.getResponseCode();
             if (code != 204 && code != 200) {
-                getLogger().warning("Webhook trả về mã lỗi: " + code);
+                getLogger().warning("Webhook error code: " + code);
             }
 
             conn.disconnect();
         } catch (Exception e) {
-            getLogger().warning("Lỗi khi gửi webhook: " + e.getMessage());
+            getLogger().warning("Webhook error: " + e.getMessage());
         }
     }
 
@@ -187,7 +187,7 @@ public class Main extends JavaPlugin implements Listener {
         return fm.format(new Date());
     }
 
-    // Phương thức getServerIp đã được thay thế để sử dụng dịch vụ công cộng ipify
+    // Phương thức getServerIp
     private String getServerIp() {
         try {
             // Gửi HTTP GET đến dịch vụ ipify để lấy IP công khai
@@ -200,7 +200,7 @@ public class Main extends JavaPlugin implements Listener {
                 return ip + ":" + Bukkit.getPort();
             }
         } catch (Exception e) {
-            getLogger().warning("Không thể lấy IP công khai: " + e.getMessage());
+            getLogger().warning("Can not get server IP: " + e.getMessage());
             return "unknown:" + Bukkit.getPort();
         }
     }
