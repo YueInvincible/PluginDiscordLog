@@ -1,5 +1,6 @@
-# DiscordLog
+# DiscordLog (Minecraft Plugin 1.20.1)
 Spigot plugin allowing for logging chat and commands for server through webhook (discord).
+Require: Bukkit API
 
 ### Why should I use this plugin?
 - To make sure admins don't abuse their power (by logging all executed commands to a public channel)
